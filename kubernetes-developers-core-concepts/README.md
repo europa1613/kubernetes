@@ -85,5 +85,9 @@ kubectl proxy # dashboard is started
 
 ```
 
+## Creating Pods
+
+
+
 
 
