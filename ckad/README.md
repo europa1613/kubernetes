@@ -101,6 +101,77 @@ kubectl scale rs new-replica-set --replicas=2
 
 ![Deployment Definition](deployment.png)
 
+```bash
+kubectl get all
+```
+
+#### Practice Test - Deployments
+https://uklabs.kodekloud.com/topic/deployments-5/
+
+```bash
+
+controlplane ~ ➜  kubectl get pods
+No resources found in default namespace.
+
+controlplane ~ ➜  kubectl get rs
+No resources found in default namespace.
+
+controlplane ~ ➜  kubectl get deployments
+No resources found in default namespace.
+
+controlplane ~ ➜  kubectl get deployment
+No resources found in default namespace.
+
+```
+**Create a deployment with yaml**
+
+```bash
+kubectl create deployment --help
+
+arvins-mac @ ~/1-gitspace/kubernetes  (main)
+ [28] → kubectl create deployment --help
+Create a deployment with the specified name.
+
+Aliases:
+deployment, deploy
+
+Examples:
+  # Create a deployment named my-dep that runs the busybox image
+  kubectl create deployment my-dep --image=busybox
+
+  # Create a deployment with a command
+  kubectl create deployment my-dep --image=busybox -- date
+
+  # Create a deployment named my-dep that runs the nginx image with 3 replicas
+  kubectl create deployment my-dep --image=nginx --replicas=3
+
+  # Create a deployment named my-dep that runs the busybox image and expose port 5701
+  kubectl create deployment my-dep --image=busybox --port=5701
+
+```
+![Deployment Help](deployment-help-cmd.png)
+
+```yml
+controlplane ~ ➜  cat dep-httpd.yaml 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: httpd-pod
+  template:
+    metadata:
+      labels:
+        name: httpd-pod
+    spec:
+      containers:
+      - name: httpd-container
+        image: httpd:2.4-alpines
+```
 
 
 
