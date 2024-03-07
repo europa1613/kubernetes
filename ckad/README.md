@@ -18,7 +18,7 @@ Apply the coupon code **udemystudent030485**
 
 ---
 
-### Practice Test - Pods
+### Pods
 https://uklabs.kodekloud.com/topic/pods-4/
 ```bash
 kubectl get pods
@@ -52,4 +52,59 @@ To modify the properties of the pod, you can utilize the `kubectl edit pod <pod-
 - spec.terminationGracePeriodSeconds
 
 ---
+
+### ReplicaSets
+- ReplicationController **(Old)**
+  ![ReplicationController](rc.png)
+- ReplicaSet **(New)**
+  ![ReplicaSet](rs.png)
+
+#### Scaling Replicaset
+![Scale ReplicaSet](scale-rs.png)
+
+#### Commands
+```bash
+kubectl create -f rs-definition.yml
+kubectl get replicaset
+kubectl get rs
+kubectl delete replicaset myapp-replicaset
+kubectl replace replicaset rs-definition.yml
+kubectl scale -replicas=6 -f rs-definition.yml
+```
+#### Practice Test - ReplicaSets
+https://uklabs.kodekloud.com/topic/replicasets-2/
+
+```bash
+kubectl explain rs
+
+# modifying image of a replicaset
+kubectl edit rs new-replica-set
+
+# Image is updated but pods are still down
+kubectl describe rs new-replica-set
+
+# delete all pods. ReplicaSet will create new pods with the updated image
+kubectl delete pod new-replica-set-62tmv  new-replica-set-6g6jf  new-replica-set-jw7cd  new-replica-set-pv442
+
+kubectl get rs
+NAME              DESIRED   CURRENT   READY   AGE
+new-replica-set   4         4         4       27m
+
+#Scale
+kubectl scale --replicas=5 rs new-replica-set
+#OR
+kubectl scale rs new-replica-set --replicas=2
+
+```
+
+### Deployments
+
+![Deployment Definition](deployment.png)
+
+
+
+
+
+
+
 
