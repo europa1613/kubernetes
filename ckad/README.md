@@ -390,6 +390,25 @@ kubectl run httpd --image=httpd:alpine --port=80 --expose
 
 ```
 
+### Creating an Image - Docker
+![Create Image - Docker](create-img-docker.png)
+![Dockerfile](dockerfile.png)
+![Layered Architecture](docker-layered-arch.png)
+
+#### Practice Test - Docker Images
+https://uklabs.kodekloud.com/topic/practice-test-docker-images-2/
+
+![Docker CMD](docker-cmd.png)
+![Docker CMD vs ENTRYPOINT](docker-cmd-entrypoint.png)
+![Docker CMD & ENTRYPOINT Override at runtime](docker-cmd-entrypoint-ovrd.png)
+
+
+
+
+
+
+
+
 
 
 
