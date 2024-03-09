@@ -402,6 +402,58 @@ https://uklabs.kodekloud.com/topic/practice-test-docker-images-2/
 ![Docker CMD vs ENTRYPOINT](docker-cmd-entrypoint.png)
 ![Docker CMD & ENTRYPOINT Override at runtime](docker-cmd-entrypoint-ovrd.png)
 
+### Commands and Args in K8S
+![Container Args in Pods](container-args-pods.png)
+![Docker Entrypoint to Pods Command](dckr-entrypnt-pod-cmd.png)
+![ocker Entrypoint to Pods Command 2](dckr-entrypnt-pod-cmd-2.png)
+
+**Note:**
+The Pod container's `command` field overrides the Docker Image's `ENTRYPOINT` and `args` field overrides the Docker Image's `CMD` instruction in the dockerfile.
+
+### More info on editing pods (restrictive)
+https://www.udemy.com/course/certified-kubernetes-application-developer/learn/lecture/14937910#overview
+
+### Edit Deployments
+With Deployments you can easily edit any field/property of the POD template. Since the pod template is a child of the deployment specification,  with every change the deployment will automatically delete and create a new pod with the new changes. So if you are asked to edit a property of a POD part of a deployment you may do that simply by running the command
+```bash
+kubectl edit deployment my-deployment
+```
+#### K8S Practice Test - Commands and Arguments
+https://uklabs.kodekloud.com/topic/commands-and-arguments/
+
+```bash
+kubectl replace --froce -f /tmp/kubectl-edit-2983735657.yaml
+
+#pass command and args from kubectl
+#see kubectl run --help
+kubectl run webapp-green --image=kodekloud/webapp-color -- --color green
+
+kubectl run webapp-green --image=kodekloud/webapp-color --command -- python app.py --color green
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
