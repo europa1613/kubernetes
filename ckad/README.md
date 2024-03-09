@@ -431,6 +431,163 @@ kubectl run webapp-green --image=kodekloud/webapp-color -- --color green
 kubectl run webapp-green --image=kodekloud/webapp-color --command -- python app.py --color green
 ```
 
+### Environment Variables
+![Env Variables](env-variables.png)
+![Env Types](env-types.png)
+
+### ConfigMaps
+![ConfigMaps Imperative](configmaps-imperative.png)
+![ConfigMaps Declarative](configmaps-declarative.png)
+![ConfigMaps Orginize](configmaps-org.png)
+
+```bash
+kubectl get configmaps
+kubectl describle configmaps
+```
+
+![ConfigMap in Pod](configMap-pod.png)
+
+![ConfigMap Usage](configMap-usage.png)
+
+#### Practice Test - ConfigMaps
+https://uklabs.kodekloud.com/topic/configmaps-2/
+
+```bash
+kubectl get pod webapp-color -o yaml
+
+controlplane ~ ➜  kubectl edit pod webapp-color 
+error: pods "webapp-color" is invalid
+A copy of your changes has been stored to "/tmp/kubectl-edit-2928123911.yaml"
+error: Edit cancelled, no valid changes were saved.
+
+controlplane ~ ✖ kubectl replace --force -f /tmp/kubectl-edit-2928123911.yaml
+pod "webapp-color" deleted
+pod/webapp-color replaced
+
+
+controlplane ~ ➜  kubectl create configmap webapp-config-map --from-literal=APP_COLOR=darkblue --from-literal=APP_OTHER=disregard
+configmap/webapp-config-map created
+```
+#### Add Config reference to webapp-color
+
+```bash
+controlplane ~ ➜  kubectl edit pod webapp-color 
+error: pods "webapp-color" is invalid
+A copy of your changes has been stored to "/tmp/kubectl-edit-538297002.yaml"
+error: Edit cancelled, no valid changes were saved.
+```
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2024-03-09T07:41:01Z"
+  labels:
+    name: webapp-color
+  name: webapp-color
+  namespace: default
+  resourceVersion: "1347"
+  uid: d11ca179-6f3a-46d7-916f-91360b46547e
+spec:
+  containers:
+  - env:
+    - name: APP_COLOR
+      valueFrom:
+        configMapKeyRef:
+          key: APP_COLOR
+          name: webapp-config-map
+    image: kodekloud/webapp-color
+    imagePullPolicy: Always
+    name: webapp-color
+    resources: {}
+```
+
+```bash
+controlplane ~ ✖ kubectl replace --force -f /tmp/kubectl-edit-538297002.yaml
+pod "webapp-color" deleted
+pod/webapp-color replaced
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sss
 
 
 
