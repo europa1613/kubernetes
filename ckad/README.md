@@ -590,7 +590,50 @@ spec:
         name: db-secret
 ```
 
+### Encrypting Secret Data at Rest
 
+https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
+
+```bash
+kubectl create secret generic --help
+
+kubectl create secret generic my-secret --from-literal=key1=supersecret
+
+kubectl get secret
+
+kubectl describe secret my-secret
+
+kubectl get secret my-secret -o yaml
+
+echo "<base64-string>" | base64 --decode
+
+#---------------------------------------
+# look in etcd how the secret is stored
+# install etcdctl
+apt-get install etcd-client
+
+kubectl get pods -n kube-system
+
+ETCDCTL_API=3 etcdctl \
+   --cacert=/etc/kubernetes/pki/etcd/ca.crt   \
+   --cert=/etc/kubernetes/pki/etcd/server.crt \
+   --key=/etc/kubernetes/pki/etcd/server.key  \
+   get /registry/secrets/default/my-secret
+
+ETCDCTL_API=3 etcdctl \
+   --cacert=/etc/kubernetes/pki/etcd/ca.crt   \
+   --cert=/etc/kubernetes/pki/etcd/server.crt \
+   --key=/etc/kubernetes/pki/etcd/server.key  \
+   get /registry/secrets/default/secret1 | hexdump -C
+
+ps -aux
+ps -aux | grep kube-api
+ps -aux | grep kube-api | grep "encryption-provider-config"
+
+ls /etc/kubernetes/manifests/
+cat /etc/kubernetes/manifests/kube-apiserver.yaml
+
+```
 
 
 
