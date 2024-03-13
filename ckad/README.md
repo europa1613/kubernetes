@@ -635,9 +635,136 @@ cat /etc/kubernetes/manifests/kube-apiserver.yaml
 
 ```
 
+### Docker/Container Security
+![Docker Security](docker-security.png)
 
+```bash
+docker run --cap-drop KILL ubuntu
+```
 
+### Security Contexts
 
+#### Pod level
+![Security Context - Pod](security-context-pod.png)
+
+#### Container Level
+![Security Context - Container](security-context-container.png)
+
+#### Practice Test - Security Contexts
+https://uklabs.kodekloud.com/topic/security-contexts-3/
+
+```bash
+#check which user is running on the container
+kubectl exec ubuntu-sleeper -- whoami
+```
+
+Edit the pod ubuntu-sleeper to run the sleep process with user ID 1010.
+**Note:** Only make the necessary changes. Do not modify the name or image of the pod.
+```bash
+kubectl edit  pod ubuntu-sleeper
+```
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2024-03-13T06:53:10Z"
+  name: ubuntu-sleeper
+  namespace: default
+  resourceVersion: "842"
+  uid: 1a2a937a-e156-45de-b224-3b533a6f43b2
+spec:
+  securityContext:
+    runAsUser: 1010
+  containers:
+  - command:
+    - sleep
+    - "4800"
+    image: ubuntu
+    imagePullPolicy: Always
+    name: ubuntu
+    resources: {}
+```
+```bash
+kubectl replace --force -f /tmp/kubectl-edit-417932953.yaml
+```
+
+To delete the existing ubuntu-sleeper pod:
+```bash
+kubectl delete po ubuntu-sleeper 
+```
+After that apply solution manifest file to run as user 1010 as follows:
+```yml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-sleeper
+  namespace: default
+spec:
+  securityContext:
+    runAsUser: 1010
+  containers:
+  - command:
+    - sleep
+    - "4800"
+    image: ubuntu
+    name: ubuntu-sleeper
+```
+Then run the command `kubectl apply -f <file-name>.yaml` to create a resource.
+
+**NOTE:** TO delete the pod faster, you can run `kubectl delete pod ubuntu-sleeper --force`. This can be done for any pod in the lab or the actual exam. It is not recommended to run this in Production, so keep a note of that.
+
+#### Add Capability
+
+To delete the existing pod:
+```bash
+kubectl delete po ubuntu-sleeper
+```
+After that apply solution manifest file to add capabilities in ubuntu-sleeper pod:
+```yml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-sleeper
+  namespace: default
+spec:
+  containers:
+  - command:
+    - sleep
+    - "4800"
+    image: ubuntu
+    name: ubuntu-sleeper
+    securityContext:
+      capabilities:
+        add: ["SYS_TIME"]
+```
+then run the command `kubectl apply -f <file-name>.yaml` to create a pod from given definition file.
+
+To delete the existing pod:
+```bash
+kubectl delete po ubuntu-sleeper
+```
+After that apply solution manifest file to add capabilities in ubuntu-sleeper pod:
+```yml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-sleeper
+  namespace: default
+spec:
+  containers:
+  - command:
+    - sleep
+    - "4800"
+    image: ubuntu
+    name: ubuntu-sleeper
+    securityContext:
+      capabilities:
+        add: ["SYS_TIME", "NET_ADMIN"]
+```
+then run the command `kubectl apply -f <file-name>.yaml` to create a pod from given definition file.
 
 
 
