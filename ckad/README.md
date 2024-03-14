@@ -937,13 +937,70 @@ controlplane ~ ➜  history
    11  kubectl delete pod elephant
 ```
 
+### Taints and Tolerations
+![Taint Nodes](taint-nodes.png)
 
+![Tolerations Pods](tolerations-pods.png)
 
+#### Taint - NoExecute
+If there are existing pods on a node that dont have tolerations for that node, they're evicted/killed after the taint is applied.
 
+![Master Node Taint](master-node-taint.png)
 
+#### Practice Test - Taints and Toleration
+https://uklabs.kodekloud.com/topic/taints-and-tolerations-3/
 
-
-
+```bash
+controlplane ~ ➜  history
+    1  kubectl get nodes
+    2  kubectl desribe node node01 | grep taint
+    3  kubectl describe node node01 | grep taint
+    4  kubectl taint nodes node01 spray=mortein:NoSchedule
+    5  kubectl describe node node01 | grep taint
+    6  kubectl describe node node01 | grep Taint
+    7  kubectl run mosquito --image=nginx
+    8  kubectl get pod -o wide
+    9  kubectl run mosquito --image=nginx
+   10  kubectl get pod -o wide
+   11  kubectl run --help
+   12  nano bee.yaml
+   13  kubectl apply -f bee.yaml 
+   14  cat bee.yaml 
+   15  nano bee.yaml 
+   16  kubectl apply -f bee.yaml 
+   17  nano bee.yaml 
+   18  kubectl apply -f bee.yaml 
+   19  kubectl get pods -o wide
+   20  kubectl describe node controlplane | grep Taint
+   21  kubectl taint --help
+   22  kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+   23  kubectl get pods
+   24  kubectl get pods -o wide
+```
+#### Create Taint on node node01
+```bash
+kubectl taint nodes node01 spray=mortein:NoSchedule
+```
+#### Create Pod with tolerations for above taint
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bee
+spec:
+  containers:
+    - image: nginx
+      name: nginx-bee
+  tolerations:
+    - key: "spray"
+      operator: "Equal"
+      value: "mortein"
+      effect: "NoSchedule"
+```
+Run the command to untaint the node: 
+```bash
+kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+```
 
 
 
