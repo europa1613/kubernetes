@@ -766,9 +766,150 @@ spec:
 ```
 then run the command `kubectl apply -f <file-name>.yaml` to create a pod from given definition file.
 
+### Service Accounts
+Two types of accounts:
+- User
+- Service
+![User - Service Accounts](user-service-accs.png)
+
+![Create Service Account](create-svc-acc.png)
+
+![Service Account Token](service-acc-token.png)
+ - Use the service account token to authenticate against the kube-api 
+  Example: 
+  ```bash
+  curl https://192.168.56.70:6443/api --insecure --header "Authorization: Bearer <token>"
+  ```
+Default Service account token secret is mounted to pod by default.
+![Default Service Account Token](default-svc-acc-secret.png)
+
+![Service Acc in Pod](service-acc-pod.png)
+
+![Service Acc token Automount](svc-tkn-automnt.png)
+
+![Decode Token](decode-token.png)
+
+![Bound Svc Acc Tokens](bound-svc-acc-tokens.png)
+
+![Bound Svc Acc Tokens](bound-svc-acc-tokens-2.png)
+
+![Projected Volume](token-projected-vol.png)
+
+![Manual servie account token creation](create-token-1.24.png)
+
+![Token info in 1.24](token-decode-1.24.png)
+
+![Old way of creating secret service acc token](old-way-post-1.24.png)
+
+![Note on Service Account tokens](service-acc-tokns-note.png)
 
 
+![Sevice Account Token References](svc-acc-tkn-refs.png)
 
+
+#### Practice Test - Service Acccount
+https://uklabs.kodekloud.com/topic/service-account-2/
+
+```bash
+    1  kubectl get serviceaccounts
+    2  kubectl describe serviceaccount default 
+    3  kubectl get deploy
+    4  kubectl describe deploy web-dashboard 
+    5  kubectl get deploy web-dashboard -o yaml
+    6  kubectl get pods
+    7  kubectl describe pod web-dashboard-74cbcd9494-dcxts 
+    8  kubectl create serviceaccount dashboard-sa
+    9  kubectl get serviceaccounts
+   10  ls -ltr /var/rbac/
+   11  cat pod-reader-role.yaml
+   12  cat /var/rbac/pod-reader-role.yaml 
+   13  cat /var/rbac/dashboard-sa-role-binding.yaml 
+
+controlplane ~ ✖ cat /var/rbac/pod-reader-role.yaml 
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - get
+  - watch
+  - list
+
+controlplane ~ ➜  cat /var/rbac/dashboard-sa-role-binding.yaml 
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: dashboard-sa # Name is case sensitive
+  namespace: default
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: pod-reader # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+
+```
+
+Enter the access token in the UI of the dashboard application. Click Load Dashboard button to load Dashboard
+
+Create an authorization token for the newly created service account, copy the generated token and paste it into the token field of the UI.
+
+To do this, run `kubectl create token dashboard-sa` for the dashboard-sa service account, copy the token and paste it in the UI.
+```bash
+kubectl edit deploy web-dashboard
+```
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+  creationTimestamp: "2024-03-13T15:40:33Z"
+  generation: 2
+  name: web-dashboard
+  namespace: default
+  resourceVersion: "1187"
+  uid: 750fc2b6-cfbd-4488-83de-dddb56850f26
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: web-dashboard
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: web-dashboard
+    spec:
+      containers:
+      - env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        image: gcr.io/kodekloud/customimage/my-kubernetes-dashboard
+        imagePullPolicy: Always
+        name: web-dashboard
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+```
 
 
 
