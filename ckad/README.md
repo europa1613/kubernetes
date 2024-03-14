@@ -911,6 +911,39 @@ spec:
         resources: {}
 ```
 
+### Resource Requirements
+![Resource Requests](resource-reqs.png)
+![Resource Memory](resource-memory.png)
+![Resource Limits](resource-limits.png)
+![Resource Limit Range](resource-limits-range.png)
+![Resource Quotas](resource-quotas.png)
+![Resources Doc Referenc](resources-doc-ref.png)
+
+#### Practice Test - Resource Requirements
+https://uklabs.kodekloud.com/topic/resource-limits-2/
+
+```bash
+controlplane ~ ➜  history
+    1  kubectl get pods
+    2  kubectl describe pod rabbit 
+    3  kubectl delete pod rabbit 
+    4  kubectl describe pod elephant 
+    5  kubectl logs elephant 
+    6  kubectl edit pod elephant 
+    7  cat /tmp/kubectl-edit-1545382757.yaml
+    8  kubectl delete pod elephant 
+    9  kubectl apply -f /tmp/kubectl-edit-1545382757.yaml
+   10  kubectl get pods
+   11  kubectl delete pod elephant
+```
+
+
+
+
+
+
+
+
 
 
 
