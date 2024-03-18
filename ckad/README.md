@@ -1002,16 +1002,153 @@ Run the command to untaint the node:
 kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
 ```
 
+### Node Selectors
+![Label Nodes](node-selectors-labels.png)
+
+![Node Selector](node-selector-pod.png)
 
 
+### Node Affinity
 
+![Node Affinity](node-affinity.png)
 
+![Node Affinity - Expressions](node-affinity-exprns-1.png)
 
+![Node Affinity - NotIn](node-affinity-notin.png)
 
+![Node Affinity - Types](node-affinity-types.png)
 
+#### Practice Test - Node Affinity
+https://uklabs.kodekloud.com/topic/node-affinity-3/
 
+```bash
+#Identify labels on nodes 
+kubectl describe nodes node01 # see labels section
 
+# Apply label to node
+kubectl label node node01 color=blue
 
+# Create deployment with name blue
+kubectl create deploy blue --image=nginx --replicas=3
+
+# Check Taints on nodes
+kubectl describe node node01 | grep Taints
+
+# Search node affinity on kubernetes documentation page
+# Set Node Affinity to deployment to place pods on node01 only
+kubectl edit deploy blue
+# or
+kubectl get deploy blue -o yaml > blue.yaml
+
+# edit and add affinity section under pod template
+
+affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: color
+            operator: In
+            values:
+            - blue
+
+```
+
+```bash
+controlplane ~ ➜  cat red.yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2024-03-18T04:48:09Z"
+  generation: 1
+  labels:
+    app: red
+  name: red
+  namespace: default
+  resourceVersion: "2309"
+  uid: 9eb0d574-3aaa-406f-bdf5-5adf663f3e49
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: red
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: red
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 3
+  conditions:
+  - lastTransitionTime: "2024-03-18T04:48:17Z"
+    lastUpdateTime: "2024-03-18T04:48:17Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2024-03-18T04:48:09Z"
+    lastUpdateTime: "2024-03-18T04:48:17Z"
+    message: ReplicaSet "blue-747bd9c977" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 3
+  replicas: 3
+  updatedReplicas: 3
+```
+##### Label `Exists` Operator
+```yml
+spec:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+    containers:
+    - image: nginx
+      imagePullPolicy: Always
+      name: nginx
+      resources: {}
+```
+
+#### Certification Tips - Student Tips
+Make sure you check out these tips and tricks from other students who have cleared the exam:
+
+- https://www.linkedin.com/pulse/my-ckad-exam-experience-atharva-chauthaiwale/
+- https://medium.com/@harioverhere/ckad-certified-kubernetes-application-developer-my-journey-3afb0901014
+- https://github.com/lucassha/CKAD-resources
 
 
 
