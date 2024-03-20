@@ -1391,12 +1391,98 @@ spec:
 kuubectl delete pod --all
 ```
 
+### Logging
+Works for one container pods
+```bash
+kubectl create -f event-simulator.yaml
+kubectl logs -f event-simulator-pod
+```
+![Logs - pod](logs-pod.png)
+
+Multi-Container Pods
+![Logs - Multi Containers](logs-multi-containers.png)
+
+```bash
+kubectl logs <pod-name> <container-name>
+```
+
+#### Practice Test - Container Logging
+https://uklabs.kodekloud.com/topic/logging-2/
+
+```bash
+kubectl get pods
+kubectl logs -f webapp-1 
+kubectl get pods
+kubectl describe pod webapp-2
+kubectl logs webapp-2 simple-webapp 
+```
+
+### Monitoring 
+![Monitoring - Metrics Server](monitoring-metrics-server.png)
+
+![Monitoring - Heapster vs Metrics Server](monitoring-heapster-v-metrics-server.png)
+
+#### Metrics Server
+- Single cluster
+- metrics of nodes and pods
+- In-Memory
+- Kubelet
+  - cAdvisor (container advisor)
+- 
+
+![Monitoring - Metrics server installation](monitoring-metrics-server-installation.png)
+
+![Monitoring - View metrics](monitoring-view-metrics.png)
 
 
+#### Practice Test - Monitoring
+https://uklabs.kodekloud.com/topic/monitoring-2/
+
+```bash
+#Let us deploy metrics-server to monitor the PODs and Nodes. Pull the git repository for the deployment files.
+
+git clone https://github.com/kodekloudhub/kubernetes-metrics-server.git
+
+controlplane ~ ➜  git clone https://github.com/kodekloudhub/kubernetes-metrics-server.git
+Cloning into 'kubernetes-metrics-server'...
+remote: Enumerating objects: 31, done.
+remote: Counting objects: 100% (19/19), done.
+remote: Compressing objects: 100% (19/19), done.
+remote: Total 31 (delta 8), reused 0 (delta 0), pack-reused 12
+Receiving objects: 100% (31/31), 8.08 KiB | 8.08 MiB/s, done.
+Resolving deltas: 100% (10/10), done.
+
+# Deploy the metrics-server by creating all the components downloaded.
 
 
+#Run the kubectl create -f . command from within the downloaded repository.
 
+controlplane ~ ➜  ls
+kubernetes-metrics-server  sample.yaml
 
+controlplane ~ ➜  cd kubernetes-metrics-server/
+
+controlplane kubernetes-metrics-server on  master ➜  ls -ltr
+total 32
+-rw-r--r-- 1 root root  219 Mar 20 10:41 README.md
+-rw-r--r-- 1 root root  303 Mar 20 10:41 auth-delegator.yaml
+-rw-r--r-- 1 root root  384 Mar 20 10:41 aggregated-metrics-reader.yaml
+-rw-r--r-- 1 root root  612 Mar 20 10:41 resource-reader.yaml
+-rw-r--r-- 1 root root  249 Mar 20 10:41 metrics-server-service.yaml
+-rw-r--r-- 1 root root 1007 Mar 20 10:41 metrics-server-deployment.yaml
+-rw-r--r-- 1 root root  293 Mar 20 10:41 metrics-apiservice.yaml
+-rw-r--r-- 1 root root  324 Mar 20 10:41 auth-reader.yaml
+
+controlplane kubernetes-metrics-server on  master ➜  kubectl create -f .
+
+# It takes a few minutes for the metrics server to start gathering data.
+
+# Run the kubectl top node command and wait for a valid output.
+
+kubectl top node
+kubectl top pod
+
+```
 
 
 
