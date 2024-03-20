@@ -1346,9 +1346,50 @@ https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 #### Practice Test – Init Containers
 https://uklabs.kodekloud.com/topic/init-containers-3/
 
+### Observability:
+![Pod Conditions](pod-conditions.png)
 
+![Readiness Probe](readiness-probe.png)
+![Readiness Probe Options](readiness-probe-options.png)
 
+![Liveness Probe](liveness-probe.png)
+![Liveness Probe - Pod](liveness-probe-pod.png)
+![Liveness Probe - Options](liveness-probe-options.png)
 
+#### Practice Test - Readiness and Liveness Probes
+https://uklabs.kodekloud.com/topic/readiness-probes-2/
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2024-03-20T08:50:30Z"
+  labels:
+    name: simple-webapp
+  name: simple-webapp-2
+  namespace: default
+  resourceVersion: "1185"
+  uid: ca41e0eb-416a-4987-a42f-188b7c24bd5d
+spec:
+  containers:
+  - env:
+    - name: APP_START_DELAY
+      value: "80"
+    image: kodekloud/webapp-delayed-start
+    imagePullPolicy: Always
+    name: simple-webapp
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+```
+
+```bash
+kuubectl delete pod --all
+```
 
 
 
