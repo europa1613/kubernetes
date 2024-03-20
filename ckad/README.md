@@ -1150,28 +1150,201 @@ Make sure you check out these tips and tricks from other students who have clear
 - https://medium.com/@harioverhere/ckad-certified-kubernetes-application-developer-my-journey-3afb0901014
 - https://github.com/lucassha/CKAD-resources
 
+### Multi Container Pods
+![Create Multi-Container Pods](create-multi-container-pods.png)
+
+![Multi-Container patterns](multi-container-patterns.png)
+
+![Multi-Container - Sidecar](multi-container-sidecar.png)
+
+![Multi-Container - Adapter](multi-container-adapter.png)
+
+![Multi-Container - Ambassador](multi-container-ambassador.png)
+
+#### Practice Test - Multi-Container Pods
+https://uklabs.kodekloud.com/topic/multi-container-pods-3/
+
+```bash
+# Create a multi-container pod with 2 containers.
+# Use the spec given below:
+# If the pod goes into the crashloopbackoff then add the command sleep 1000 in the lemon container.
+
+controlplane ~ ➜  kubectl run yellow --image=busybox --dry-run=client -o yaml > q3-busybox-redis.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: yellow
+  name: yellow
+spec:
+  containers:
+  - image: busybox
+    name: yellow
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+controlplane ~ ➜  cat q3-busybox-redis.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: yellow
+  name: yellow
+spec:
+  containers:
+  - image: busybox
+    name: lemon
+    command:
+    - sleep
+    - "1000"
+  - image: redis
+    name: gold
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
 
 
+kubectl apply -f q3-busybox-redis.yaml
 
 
+#Once the pod is in a ready state, inspect the Kibana UI using the link above your terminal. There shouldn't be any logs for now.
+
+#We will configure a sidecar container for the application to send logs to Elastic Search.
+
+#NOTE: It can take a couple of minutes for the Kibana UI to be ready after the Kibana pod is ready.
+
+#You can inspect the Kibana logs by running:
+
+kubectl -n elastic-stack logs kibana
 
 
+#The application outputs logs to the file /log/app.log. View the logs and try to identify the user having issues with Login.
+
+#Inspect the log file inside the pod.
+# Exec in to the container and inspect logs stored in /log/app.log
+
+kubectl exec  --help
+
+kubectl -n elastic-stack exec app -i -t -- cat /log/app.log
+# OR
+kubectl -n elastic-stack exec -it app -- cat /log/app.log
+
+# OR 
+kubectl logs app -n elastic-stack
+```
+
+![multi-container-q8](multi-container-q8.png)
+
+**Solution:**
+```yml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app
+  namespace: elastic-stack
+  labels:
+    name: app
+spec:
+  containers:
+  - name: app
+    image: kodekloud/event-simulator
+    volumeMounts:
+    - mountPath: /log
+      name: log-volume
+
+  - name: sidecar
+    image: kodekloud/filebeat-configured
+    volumeMounts:
+    - mountPath: /var/log/event-simulator/
+      name: log-volume
+
+  volumes:
+  - name: log-volume
+    hostPath:
+      # directory location on host
+      path: /var/log/webapp
+      # this field is optional
+      type: DirectoryOrCreate
+```
+
+```bash
+kubectl get pod app -n elastic-stack -o yaml
+nano q8.yaml
+kubectl apply -f q8.yaml 
+kubectl get pods -n elastic-stack 
+kubectl delete pod app -n elastic-stack 
+kubectl apply -f q8.yaml 
+kubectl get pods -n elastic-stack 
+
+```
 
 
+#### Init Containers
+
+In a multi-container pod, each container is expected to run a process that stays alive as long as the POD's lifecycle. For example in the multi-container pod that we talked about earlier that has a web application and logging agent, both the containers are expected to stay alive at all times. The process running in the log agent container is expected to stay alive as long as the web application is running. If any of them fails, the POD restarts.
+
+But at times you may want to run a process that runs to completion in a container. For example a process that pulls a code or binary from a repository that will be used by the main web application. That is a task that will be run only one time when the pod is first created. Or a process that waits for an external service or database to be up before the actual application starts. That's where **initContainers** comes in.
+
+An **initContainer** is configured in a pod like all other containers, except that it is specified inside a `initContainers` section, like this:
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: myapp-container
+    image: busybox:1.28
+    command: ['sh', '-c', 'echo The app is running! && sleep 3600']
+  initContainers:
+  - name: init-myservice
+    image: busybox
+    command: ['sh', '-c', 'git clone <some-repository-that-will-be-used-by-application> ;']
+```
+
+When a POD is first created the initContainer is run, and the process in the initContainer must run to a completion before the real container hosting the application starts.
+
+You can configure multiple such initContainers as well, like how we did for multi-pod containers. In that case each init container is run **one at a time in sequential order**.
+
+If any of the initContainers fail to complete, Kubernetes restarts the Pod repeatedly until the Init Container succeeds.
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: myapp-container
+    image: busybox:1.28
+    command: ['sh', '-c', 'echo The app is running! && sleep 3600']
+  initContainers:
+  - name: init-myservice
+    image: busybox:1.28
+    command: ['sh', '-c', 'until nslookup myservice; do echo waiting for myservice; sleep 2; done;']
+  - name: init-mydb
+    image: busybox:1.28
+    command: ['sh', '-c', 'until nslookup mydb; do echo waiting for mydb; sleep 2; done;']
+```
+
+Read more about initContainers here. And try out the upcoming practice test.
+
+https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+#### Practice Test – Init Containers
+https://uklabs.kodekloud.com/topic/init-containers-3/
 
 
 
